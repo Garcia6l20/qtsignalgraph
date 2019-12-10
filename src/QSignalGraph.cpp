@@ -1,0 +1,1 @@
+#include <QSignalGraph.hpp>
