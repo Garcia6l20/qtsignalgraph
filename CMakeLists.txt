@@ -27,4 +27,12 @@ target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Core)
 target_compile_definitions(${PROJECT_NAME} PUBLIC QT_NO_FOREACH=1)
 
-add_subdirectory(tests)
+option(QT_SIGNALGRAPH_TESTS_EN "Enable ${PROJECT_NAME} testing" ON)
+if(QT_SIGNALGRAPH_TESTS_EN)
+    add_subdirectory(tests)
+endif()
+
+option(QT_SIGNALGRAPH_SAMPLES_EN "Enable ${PROJECT_NAME} samples" ON)
+if(QT_SIGNALGRAPH_SAMPLES_EN)
+    add_subdirectory(samples)
+endif()
