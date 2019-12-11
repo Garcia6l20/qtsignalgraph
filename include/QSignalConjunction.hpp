@@ -18,6 +18,20 @@ public:
 
     void add(QSignalSource&& src);
 
+    friend std::ostream& operator<<(std::ostream& stream, const QSignalConjunction& conj) {
+        stream << '(';
+        auto it = conj._sources.begin();
+        auto end = conj._sources.end();
+        end--;
+        for (; it != end; ++it) {
+            stream << *it;
+            stream << " & ";
+        }
+        stream << *it;
+        stream << ')';
+        return stream;
+    }
+
 signals:
     void done();
 
@@ -40,6 +54,11 @@ public:
             connect(this, &QSignalDisjunction::done, std::get<0>(funcs)),
             connect(this, &QSignalDisjunction::failed, std::get<1>(funcs))
         };
+    }
+
+    friend std::ostream& operator<<(std::ostream& stream, const QSignalDisjunction& disj) {
+        stream << '(' << std::get<0>(disj._sources) << " | " << std::get<1>(disj._sources) << ')';
+        return stream;
     }
 
 signals:

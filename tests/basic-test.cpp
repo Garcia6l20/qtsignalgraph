@@ -13,7 +13,7 @@ private:
         TestObject* srcOk1 = new TestObject();
         TestObject* srcOk2  = new TestObject();
         TestObject* srcFailed  = new TestObject();
-        QSignalGraph * graph;
+        QSignalGraph * graph = nullptr;
         mixed_test1_data() = default;
         mixed_test1_data(mixed_test1_data&&) = default;
         mixed_test1_data(const mixed_test1_data&) = delete;
@@ -21,12 +21,15 @@ private:
             srcOk1->deleteLater();
             srcOk2->deleteLater();
             srcFailed->deleteLater();
+            if (graph) {
+                graph->deleteLater();
+            }
         }
     };
     auto make_complex_test() {
         mixed_test1_data data;
         auto& [srcOk1, srcOk2, srcFailed, graph] = data;
-        graph = QSignalSource{srcOk1, &TestObject::done} && QSignalSource{srcOk2, &TestObject::done} ||
+        graph = QSignalSource{srcOk1, &TestObject::done} & QSignalSource{srcOk2, &TestObject::done} |
                 QSignalSource{srcFailed, &TestObject::done};
         return data;
     }
@@ -69,7 +72,7 @@ private slots:
         TestObject obj1;
         TestObject obj2;
         bool trigged = false;
-        auto graph = QSignalSource{&obj1, &TestObject::done} &&
+        auto graph = QSignalSource{&obj1, &TestObject::done} &
                      QSignalSource{&obj2, &TestObject::done};
         connect(graph, &QSignalGraph::done, [&trigged] {
             trigged = true;
@@ -117,6 +120,8 @@ private slots:
         srcOk2->done();
         QCOMPARE(ok.has_value(), true);
         QCOMPARE(*ok, true);
+        srcFailed->done(); // must not trig failure
+        QCOMPARE(*ok, true);
     }
     void mixedTest1_Failed1() {
         auto data = make_complex_test();
@@ -128,11 +133,16 @@ private slots:
         QObject::connect(graph, &QSignalGraph::failed, [&ok] {
             ok = false;
         });
+        const QSignalGraph& g = *graph;
+        std::cout << g << std::endl;
         QCOMPARE(ok.has_value(), false);
         srcOk1->done();
         QCOMPARE(ok.has_value(), false);
         srcFailed->done();
         QCOMPARE(ok.has_value(), true);
+        QCOMPARE(*ok, false);
+        srcOk2->done(); // must not trig done
+        srcOk1->done();
         QCOMPARE(*ok, false);
     }
 };
