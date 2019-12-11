@@ -13,9 +13,9 @@ set(${PROJECT_NAME}_headers
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-# qt5_wrap_cpp(${PROJECT_NAME}_mocs ${${PROJECT_NAME}_headers})
 
 add_library(${PROJECT_NAME}
+    include/QSignalDetails.hpp
     include/QSignalGraph.hpp
     include/QSignalConjunction.hpp
     include/QSignalSource.hpp
