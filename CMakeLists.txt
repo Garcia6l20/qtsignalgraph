@@ -18,9 +18,13 @@ add_library(${PROJECT_NAME}
     include/QSignalDetails.hpp
     include/QSignalGraph.hpp
     include/QSignalConjunction.hpp
+    include/QSignalConjunction.tpp
+    include/QSignalDisjunction.hpp
+    include/QSignalDisjunction.tpp
     include/QSignalSource.hpp
     src/QSignalGraph.cpp
     src/QSignalConjunction.cpp
+    src/QSignalDisjunction.cpp
     src/QSignalSource.cpp
 )
 target_include_directories(${PROJECT_NAME} PUBLIC include)

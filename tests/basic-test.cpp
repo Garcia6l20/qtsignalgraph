@@ -55,12 +55,12 @@ private slots:
     void manualConjunction() {
         TestObject obj1;
         TestObject obj2;
-        QSignalConjunction step {
-            {&obj1, &TestObject::done},
-            {&obj2, &TestObject::done},
-        };
+        auto step = QSignalConjunction::make(
+            QSignalSource{&obj1, &TestObject::done},
+            QSignalSource{&obj2, &TestObject::done}
+        );
         bool trigged = false;
-        QObject::connect(&step, &QSignalConjunction::done, [&trigged] {
+        QObject::connect(step.get(), &QSignalConjunction::done, [&trigged] {
             trigged = true;
         });
         obj1.done();
@@ -127,15 +127,15 @@ private slots:
     void manualDisjunction() {
         TestObject oksource;
         TestObject nopesource;
-        QSignalDisjunction step {
-            {&oksource, &TestObject::done},
-            {&nopesource, &TestObject::done}
-        };
+        auto step = QSignalDisjunction::make(
+            QSignalSource{&oksource, &TestObject::done},
+            QSignalSource{&nopesource, &TestObject::done}
+        );
         std::optional<bool> ok;
-        QObject::connect(&step, &QSignalDisjunction::done, [&ok] {
+        QObject::connect(step.get(), &QSignalDisjunction::done, [&ok](const QVariant&) {
             ok = true;
         });
-        QObject::connect(&step, &QSignalDisjunction::failed, [&ok] {
+        QObject::connect(step.get(), &QSignalDisjunction::failed, [&ok] {
             ok = false;
         });
         QCOMPARE(ok.has_value(), false);

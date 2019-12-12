@@ -35,4 +35,12 @@ namespace qsg::details {
     };
     template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
     template<class... Ts> overloaded(Ts...)->overloaded<Ts...>;
+
+    template <typename Class>
+    struct make_shared_enabler : public Class {
+        template <typename... Args>
+        make_shared_enabler(Args &&... args) :
+            Class(std::forward<Args>(args)...)
+        {}
+    };
 }
