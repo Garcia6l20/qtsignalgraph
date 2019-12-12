@@ -24,16 +24,16 @@ int main(int argc, char** argv) {
     auto finish_sig = &QNetworkReply::finished;
     auto graph = (QSignalSource{reply1, finish_sig} & QSignalSource{reply2, finish_sig})
               || (QSignalSource{reply1, error_sig} | QSignalSource{reply2, error_sig});
-    QObject::connect(graph.get(), &QSignalDisjunction::done, [url1, reply1, url2, reply2] {
+    QObject::connect(graph.get(), &QSignalBinJunction::done, [url1, reply1, url2, reply2] {
         qInfo().noquote() << QString("from %1: ").arg(url1);
         qInfo().noquote() << reply1->readAll();
         qInfo().noquote() << QString("from %1: ").arg(url2);
         qInfo().noquote() << reply2->readAll();
         qApp->quit();
     });
-    QObject::connect(graph.get(), &QSignalDisjunction::failed, [url1, reply1, url2, reply2](const QVariant& data) {
+    QObject::connect(graph.get(), &QSignalBinJunction::failed, [url1, reply1, url2, reply2](const QVariant& data) {
         auto error = data.value<QNetworkReply::NetworkError>();
-        qCritical().noquote() << "failure: " << errno;
+        qCritical().noquote() << "failure: " << error;
         qInfo().noquote() << QString("from %1: ").arg(url1);
         qInfo().noquote() << reply1->errorString();
         qInfo().noquote() << QString("from %1: ").arg(url2);

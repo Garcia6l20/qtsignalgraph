@@ -15,7 +15,7 @@ private:
         TestObject* srcOk2  = new TestObject();
         TestObject* srcFailed1  = new TestObject();
         TestObject* srcFailed2  = new TestObject();
-        QSignalDisjunctionPtr graph;
+        QSignalBinJunctionPtr graph;
         mixed_test1_data() = default;
         mixed_test1_data(mixed_test1_data&&) = default;
         mixed_test1_data(const mixed_test1_data&) = delete;
@@ -38,10 +38,10 @@ private slots:
         auto data = make_complex_test();
         auto& [srcOk1, srcOk2, srcFailed1, srcFailed2, graph] = *data;
         std::optional<bool> ok;
-        QObject::connect(&*graph, &QSignalDisjunction::done, [&ok] {
+        QObject::connect(&*graph, &QSignalBinJunction::done, [&ok] {
             ok = true;
         });
-        QObject::connect(&*graph, &QSignalDisjunction::failed, [&ok] {
+        QObject::connect(&*graph, &QSignalBinJunction::failed, [&ok] {
             ok = false;
         });
         QCOMPARE(ok.has_value(), false);
@@ -57,10 +57,10 @@ private slots:
         auto data = make_complex_test();
         auto& [srcOk1, srcOk2, srcFailed1, srcFailed2, graph] = *data;
         std::optional<bool> ok;
-        QObject::connect(graph.get(), &QSignalDisjunction::done, [&ok] {
+        QObject::connect(graph.get(), &QSignalBinJunction::done, [&ok] {
             ok = true;
         });
-        QObject::connect(graph.get(), &QSignalDisjunction::failed, [&ok] {
+        QObject::connect(graph.get(), &QSignalBinJunction::failed, [&ok] {
             ok = false;
         });
         std::cout << graph << std::endl;
@@ -79,10 +79,10 @@ private slots:
         auto data = make_complex_test();
         auto& [srcOk1, srcOk2, srcFailed1, srcFailed2, graph] = *data;
         std::optional<bool> ok;
-        QObject::connect(graph.get(), &QSignalDisjunction::done, [&ok] {
+        QObject::connect(graph.get(), &QSignalBinJunction::done, [&ok] {
             ok = true;
         });
-        QObject::connect(graph.get(), &QSignalDisjunction::failed, [&ok] {
+        QObject::connect(graph.get(), &QSignalBinJunction::failed, [&ok] {
             ok = false;
         });
         std::cout << graph << std::endl;
@@ -97,4 +97,4 @@ private slots:
 
 
 QTEST_MAIN(QSignalGraphTest)
-#include "graph-test.moc"
+#include "binary-junction-test.moc"

@@ -1,13 +1,21 @@
 #include <QSignalConjunction.hpp>
+#include <sstream>
 
-template <typename...Args>
-QSignalConjunctionPtr QSignalConjunction::make(Args...args) {
-    return std::make_shared<qsg::details::make_shared_enabler<QSignalConjunction>>(std::forward<Args>(args)...);
-}
-
-template <typename...Args>
-QSignalConjunction::QSignalConjunction(Args&&...args):
-    QSignalConjunction({std::forward<Args>(args)...}){
+void QSignalConjunction::do_connect(QSignalSource &&src) {
+    auto conn = std::make_shared<QMetaObject::Connection>();
+    *conn = src.do_connect([src = src, conn, this](QVariant data) {
+        std::stringstream ss;
+        ss << src;
+        qDebug() << this << QString::fromStdString(ss.str());
+        disconnect(*conn);
+        _sources.erase(src);
+        if (_sources.empty()) {
+            cleanup();
+            emit done(std::move(data));
+        }
+    });
+    add_auto_clean_connection(*conn);
+    _sources.emplace(std::forward<QSignalSource>(src));
 }
 
 inline std::ostream& operator<<(std::ostream& stream, const QSignalConjunction& conj) {

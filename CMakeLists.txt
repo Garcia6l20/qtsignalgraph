@@ -16,16 +16,27 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 add_library(${PROJECT_NAME}
     include/QSignalDetails.hpp
+
     include/QSignalGraph.hpp
+    src/QSignalGraph.cpp
+
+    include/QSignalSource.hpp
+    src/QSignalSource.cpp
+
+    include/QSignalBaseJunction.hpp
+    include/QSignalBaseJunction.tpp
+
+    include/QSignalBinJunction.hpp
+    include/QSignalBinJunction.tpp
+    src/QSignalBinJunction.cpp
+
     include/QSignalConjunction.hpp
     include/QSignalConjunction.tpp
+    src/QSignalConjunction.cpp
+
     include/QSignalDisjunction.hpp
     include/QSignalDisjunction.tpp
-    include/QSignalSource.hpp
-    src/QSignalGraph.cpp
-    src/QSignalConjunction.cpp
     src/QSignalDisjunction.cpp
-    src/QSignalSource.cpp
 )
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Core)

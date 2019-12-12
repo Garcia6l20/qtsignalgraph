@@ -3,9 +3,10 @@
 #include <QSignalDetails.hpp>
 #include <QSignalConjunction.hpp>
 #include <QSignalDisjunction.hpp>
+#include <QSignalBinJunction.hpp>
 
 inline QSignalConjunctionPtr operator&(QSignalSource&& lhs, QSignalSource&& rhs) {
-    return QSignalConjunction::make(std::set{std::forward<QSignalSource>(lhs), std::forward<QSignalSource>(rhs)});
+    return QSignalConjunction::make(std::forward<QSignalSource>(lhs), std::forward<QSignalSource>(rhs));
 }
 
 inline QSignalDisjunctionPtr operator|(QSignalSource&& lhs, QSignalSource&& rhs) {
@@ -22,30 +23,34 @@ namespace qsg::details {
 
 template <typename SuccessJunctionT, typename FailureJunctionT,
           std::enable_if_t<qsg::details::is_junction_v<SuccessJunctionT> && qsg::details::is_junction_v<FailureJunctionT>, int> = 0>
-inline QSignalDisjunctionPtr operator||(SuccessJunctionT&& lhs, FailureJunctionT&& rhs) {
-    return QSignalDisjunction::make(std::forward<SuccessJunctionT>(lhs), std::forward<FailureJunctionT>(rhs));
+inline QSignalBinJunctionPtr operator||(SuccessJunctionT&& lhs, FailureJunctionT&& rhs) {
+    return QSignalBinJunction::make(std::forward<SuccessJunctionT>(lhs), std::forward<FailureJunctionT>(rhs));
 }
 
 inline QSignalDisjunctionPtr operator|(QSignalConjunctionPtr&& lhs, QSignalSource&& rhs) {
-    auto disj = QSignalDisjunction::make(std::make_tuple<QSignalSource, QSignalSource>({&*lhs, &QSignalConjunction::done},
-                                                                       std::forward<QSignalSource>(rhs)));
+    auto disj = QSignalDisjunction::make(QSignalSource{&*lhs, &QSignalConjunction::done}, std::forward<QSignalSource>(rhs));
     disj->add_ref(std::forward<QSignalConjunctionPtr>(lhs));
     return disj;
 }
 
+inline QSignalDisjunctionPtr operator|(QSignalDisjunctionPtr&& lhs, QSignalSource&& rhs) {
+    lhs->add(std::forward<QSignalSource>(rhs));
+    return lhs;
+}
+
 inline QSignalDisjunctionPtr operator|(QSignalSource&& lhs, QSignalConjunctionPtr&& rhs) {
-    auto disj = QSignalDisjunction::make(std::make_tuple<QSignalSource, QSignalSource>(std::forward<QSignalSource>(lhs), {&*rhs, &QSignalConjunction::done}));
+    auto disj = QSignalDisjunction::make(std::forward<QSignalSource>(lhs), QSignalSource{&*rhs, &QSignalConjunction::done});
     disj->add_ref(std::forward<QSignalConjunctionPtr>(rhs));
     return disj;
 }
 
 inline QSignalDisjunctionPtr operator|(QSignalConjunctionPtr&& lhs, QSignalConjunctionPtr&& rhs) {
-    auto disj = QSignalDisjunction::make(std::make_tuple<QSignalSource, QSignalSource>({&*lhs, &QSignalConjunction::done}, {&*rhs, &QSignalConjunction::done}));
+    auto disj = QSignalDisjunction::make(QSignalSource{&*lhs, &QSignalConjunction::done}, QSignalSource{&*rhs, &QSignalConjunction::done});
     disj->add_ref(std::forward<QSignalConjunctionPtr>(lhs));
     disj->add_ref(std::forward<QSignalConjunctionPtr>(rhs));
     return disj;
 }
 
 inline QSignalDisjunctionPtr operator|(QSignalConjunctionPtr&& lhs, QSignalDisjunctionPtr&& rhs) {
-    return QSignalDisjunction::make(std::forward< QSignalConjunctionPtr>(lhs), std::forward<QSignalDisjunctionPtr>(rhs));
+    return QSignalDisjunction::make(std::forward<QSignalConjunctionPtr>(lhs), std::forward<QSignalDisjunctionPtr>(rhs));
 }
