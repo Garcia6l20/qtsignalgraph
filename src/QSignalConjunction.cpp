@@ -19,14 +19,14 @@ QSignalConjunction::QSignalConjunction(std::initializer_list<QSignalSource>&& so
 
 void QSignalConjunction::add(QSignalSource &&src) {
     auto conn = std::make_shared<QMetaObject::Connection>();
-    *conn = src.do_connect([src = src, conn, this] {
+    *conn = src.do_connect([src = src, conn, this](QVariant data) {
         std::stringstream ss;
         ss << src;
         qDebug() << this << QString::fromStdString(ss.str());
         disconnect(*conn);
         _sources.erase(src);
         if (_sources.empty())
-            emit done();
+            emit done(std::move(data));
     });
     add_auto_clean_connection(*conn);
     _sources.emplace(std::forward<QSignalSource>(src));
@@ -43,23 +43,23 @@ QSignalDisjunction::QSignalDisjunction(std::tuple<QSignalSource, QSignalSource>&
 
 void QSignalDisjunction::init() {
     for (auto& success_src : _successSources) {
-        auto conn = success_src.do_connect([success_src, this] {
+        auto conn = success_src.do_connect([success_src, this](QVariant data) {
             std::stringstream ss;
             ss << success_src;
             qDebug() << this << "success from" << QString::fromStdString(ss.str());
             cleanup();
-            emit done();
+            emit done(std::move(data));
         });
         _successConns.emplace_back(conn);
         add_auto_clean_connection(conn);
     }
     for (auto& failure_src : _failureSources) {
-        auto conn = failure_src.do_connect([failure_src, this] {
+        auto conn = failure_src.do_connect([failure_src, this](QVariant data) {
             std::stringstream ss;
             ss << failure_src;
             qDebug() << this << "failure from" << QString::fromStdString(ss.str());
             cleanup();
-            emit failed();
+            emit failed(std::move(data));
         });
         _failureConns.emplace_back(conn);
         add_auto_clean_connection(conn);

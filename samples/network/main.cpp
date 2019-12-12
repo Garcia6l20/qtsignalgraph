@@ -31,8 +31,9 @@ int main(int argc, char** argv) {
         qInfo().noquote() << reply2->readAll();
         qApp->quit();
     });
-    QObject::connect(graph.get(), &QSignalDisjunction::failed, [url1, reply1, url2, reply2] {
-        qCritical().noquote() << "failure...";
+    QObject::connect(graph.get(), &QSignalDisjunction::failed, [url1, reply1, url2, reply2](const QVariant& data) {
+        auto error = data.value<QNetworkReply::NetworkError>();
+        qCritical().noquote() << "failure: " << errno;
         qInfo().noquote() << QString("from %1: ").arg(url1);
         qInfo().noquote() << reply1->errorString();
         qInfo().noquote() << QString("from %1: ").arg(url2);

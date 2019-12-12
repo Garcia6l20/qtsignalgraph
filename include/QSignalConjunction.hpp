@@ -41,7 +41,7 @@ public:
     QSignalConjunction& operator=(const QSignalConjunction&) = delete;
 
 signals:
-    void done();
+    void done(QVariant);
 
 private:
     std::set<QSignalSource> _sources;
@@ -99,8 +99,8 @@ public:
     QSignalDisjunction& operator=(const QSignalDisjunction&) = delete;
 
 signals:
-    void done();
-    void failed();
+    void done(QVariant);
+    void failed(QVariant);
 
 private:
     void init();

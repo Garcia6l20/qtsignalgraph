@@ -38,7 +38,7 @@ private slots:
         TestObject obj1;
         auto d = QSignalSource(&obj1, &TestObject::done);
         bool trigged = false;
-        d.do_connect([&trigged] {
+        d.do_connect([&trigged](const QVariant&) {
             trigged = true;
         });
         obj1.done();

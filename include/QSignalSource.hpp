@@ -32,9 +32,17 @@ public:
         _do_connect = [object, func] (const QObject* target, void** target_func) {
             return QObject::connect(object, func, target, *reinterpret_cast<UnaryFunc*>(target_func));
         };
-        _do_connect_lambda = [object, func] (std::function<void()> target_func) {
-            return QObject::connect(object, func, target_func);
-        };
+        if constexpr (QtPrivate::FunctionPointer<Func>::ArgumentCount > 0) {
+            _do_connect_lambda = [object, func] (std::function<void(QVariant)> target_func) {
+                return QObject::connect(object, func, target_func);
+            };
+        } else {
+            _do_connect_lambda = [object, func](std::function<void(QVariant)> target_func) {
+                return QObject::connect(object, func, [target_func] {
+                    target_func({});
+                });
+            };
+        }
     }
 
     QSignalSource(QSignalSource&& other) noexcept:
@@ -95,6 +103,6 @@ private:
     void* _signal;
     QMetaMethod _metaMethod;
     std::function<QMetaObject::Connection(const QObject*, void**)> _do_connect;
-    std::function<QMetaObject::Connection(std::function<void()>)> _do_connect_lambda;
+    std::function<QMetaObject::Connection(std::function<void(QVariant)>)> _do_connect_lambda;
 
 };
