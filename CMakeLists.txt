@@ -38,5 +38,7 @@ endif()
 
 option(QT_SIGNALGRAPH_SAMPLES_EN "Enable ${PROJECT_NAME} samples" ON)
 if(QT_SIGNALGRAPH_SAMPLES_EN)
+    enable_testing()
+    include(CTest)
     add_subdirectory(samples)
 endif()
