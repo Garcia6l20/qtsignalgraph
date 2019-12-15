@@ -4,9 +4,11 @@
 void QSignalConjunction::do_connect(QSignalSource &&src) {
     auto conn = std::make_shared<QMetaObject::Connection>();
     *conn = src.do_connect([src = src, conn, this](QVariant data) {
+#ifdef QT_SIGNALGRAPH_DEBUG
         std::stringstream ss;
         ss << src;
         qDebug() << this << QString::fromStdString(ss.str());
+#endif
         disconnect(*conn);
         _sources.erase(src);
         if (_sources.empty()) {

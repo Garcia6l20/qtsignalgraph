@@ -9,6 +9,11 @@ inline QSignalConjunctionPtr operator&(QSignalSource&& lhs, QSignalSource&& rhs)
     return QSignalConjunction::make(std::forward<QSignalSource>(lhs), std::forward<QSignalSource>(rhs));
 }
 
+inline QSignalConjunctionPtr operator&(QSignalConjunctionPtr&& lhs, QSignalSource&& rhs) {
+    lhs->add(std::forward<QSignalSource>(rhs));
+    return lhs;
+}
+
 inline QSignalDisjunctionPtr operator|(QSignalSource&& lhs, QSignalSource&& rhs) {
     return QSignalDisjunction::make(std::forward<QSignalSource>(lhs), std::forward<QSignalSource>(rhs));
 }

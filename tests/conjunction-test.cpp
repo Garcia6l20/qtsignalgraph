@@ -29,15 +29,19 @@ private slots:
     void buildConjunction() {
         TestObject obj1;
         TestObject obj2;
+        TestObject obj3;
         bool trigged = false;
         auto conj = QSignalSource{&obj1, &TestObject::done} &
-                     QSignalSource{&obj2, &TestObject::done};
+                     QSignalSource{&obj2, &TestObject::done} &
+                     QSignalSource{&obj3, &TestObject::done};
         connect(conj.get(), &QSignalConjunction::done, [&trigged] {
             trigged = true;
         });
         obj1.done();
         QCOMPARE(trigged, false);
         obj2.done();
+        QCOMPARE(trigged, false);
+        obj3.done();
         QCOMPARE(trigged, true);
         obj1.done();
         obj2.done();

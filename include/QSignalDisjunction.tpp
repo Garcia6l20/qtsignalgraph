@@ -4,10 +4,16 @@
 #include <sstream>
 
 void QSignalDisjunction::do_connect(QSignalSource&& src) {
-    auto conn = src.do_connect([src, this](QVariant data) {
+    auto conn = src.do_connect([this
+#ifdef QT_SIGNALGRAPH_DEBUG
+        , src
+#endif
+        ](QVariant data) {
+#ifdef QT_SIGNALGRAPH_DEBUG
         std::stringstream ss;
         ss << src;
         qDebug() << this << "from" << QString::fromStdString(ss.str());
+#endif
         cleanup();
         emit done(std::move(data));
     });

@@ -9,17 +9,21 @@ QSignalBinJunctionPtr QSignalBinJunction::make(Args...args) {
 
 void QSignalBinJunction::do_connect() {
     _trueConn = _trueSource.do_connect([this](QVariant data) {
+#ifdef QT_SIGNALGRAPH_DEBUG
         std::stringstream ss;
         ss << _trueSource;
         qDebug() << this << "success from" << QString::fromStdString(ss.str());
+#endif
         cleanup();
         emit done(std::move(data));
     });
     add_auto_clean_connection(_trueConn);
     _falseConn = _falseSource.do_connect([this](QVariant data) {
+#ifdef QT_SIGNALGRAPH_DEBUG
         std::stringstream ss;
         ss << _falseSource;
         qDebug() << this << "failure from" << QString::fromStdString(ss.str());
+#endif
         cleanup();
         emit failed(std::move(data));
     });

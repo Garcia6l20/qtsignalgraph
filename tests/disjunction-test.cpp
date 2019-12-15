@@ -10,7 +10,7 @@
 class QGraphDisjunctionTest: public QObject {
     Q_OBJECT
 private slots:
-    void simle() {
+    void simple() {
         TestObject success, success2, success3;
         std::optional<bool> trigged = false;
         auto graph = QSignalSource{&success, &TestObject::done} |
