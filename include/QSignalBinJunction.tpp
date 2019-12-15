@@ -8,42 +8,59 @@ QSignalBinJunctionPtr QSignalBinJunction::make(Args...args) {
 }
 
 void QSignalBinJunction::do_connect() {
-    _trueConn = _trueSource.do_connect([this](QVariant data) {
+    std::visit(qsg::details::overloaded {
+        [this](QSignalSource& src) {
+            _trueConn = src.do_connect([this](QVariant data) {
 #ifdef QT_SIGNALGRAPH_DEBUG
-        std::stringstream ss;
-        ss << _trueSource;
-        qDebug() << this << "success from" << QString::fromStdString(ss.str());
+                std::stringstream ss;
+                ss << src;
+                qDebug() << this << "success from" << QString::fromStdString(ss.str());
 #endif
-        cleanup();
-        emit done(std::move(data));
-    });
-    add_auto_clean_connection(_trueConn);
-    _falseConn = _falseSource.do_connect([this](QVariant data) {
+                cleanup();
+                emit done(std::move(data));
+            });
+            add_auto_clean_connection(_trueConn);
+        },
+        [this](auto& src) {
+            src->done([this](QVariant data) {
+                cleanup();
+                emit done(std::move(data));
+            });
+        },
+    }, _trueSource);
+    std::visit(qsg::details::overloaded{
+        [this](QSignalSource& src) {
+            _trueConn = src.do_connect([this](QVariant data) {
 #ifdef QT_SIGNALGRAPH_DEBUG
-        std::stringstream ss;
-        ss << _falseSource;
-        qDebug() << this << "failure from" << QString::fromStdString(ss.str());
+                std::stringstream ss;
+                ss << _trueSource;
+                qDebug() << this << "failure from" << QString::fromStdString(ss.str());
 #endif
-        cleanup();
-        emit failed(std::move(data));
-    });
-    add_auto_clean_connection(_falseConn);
+                cleanup();
+                emit failed(std::move(data));
+            });
+            add_auto_clean_connection(_trueConn);
+        },
+        [this](auto& src) {
+            src->done([this](QVariant data) {
+                cleanup();
+                emit failed(std::move(data));
+            });
+        },
+    }, _falseSource);
 }
 
 template <class TrueJunctionPtrT, class FalseJunctionPtrT>
 QSignalBinJunction::QSignalBinJunction(TrueJunctionPtrT&&true_j, FalseJunctionPtrT&&false_j):
-    _trueSource({true_j.get(), &std::decay_t<decltype(*true_j)>::done}),
-    _falseSource({false_j.get(), &std::decay_t<decltype(*false_j)>::done}) {
-    add_ref(std::move(true_j));
-    add_ref(std::move(false_j));
+    _trueSource(true_j),
+    _falseSource(false_j) {
     do_connect();
 }
 
 template <class TrueJunctionT>
 QSignalBinJunction::QSignalBinJunction(TrueJunctionT&&true_j, QSignalSource&&false_src):
-    _trueSource{{true_j.get(), &TrueJunctionT::done}},
+    _trueSource{true_j},
     _falseSource{false_src} {
-    add_ref(true_j);
     do_connect();
 }
 

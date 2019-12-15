@@ -4,6 +4,7 @@
 #include <QSignalDetails.hpp>
 #include <QSignalSource.hpp>
 #include <memory>
+#include <variant>
 
 class QSignalDisjunction;
 using QSignalDisjunctionPtr = std::shared_ptr<QSignalDisjunction>;
@@ -52,8 +53,9 @@ protected:
 private:
     inline void do_connect();
     void cleanup();
-    QSignalSource _trueSource;
-    QSignalSource _falseSource;
+    using source_variant = std::variant<QSignalSource, QSignalConjunctionPtr, QSignalDisjunctionPtr>;
+    source_variant _trueSource;
+    source_variant _falseSource;
     QMetaObject::Connection _trueConn;
     QMetaObject::Connection _falseConn;
 

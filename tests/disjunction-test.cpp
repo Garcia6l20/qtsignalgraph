@@ -16,7 +16,7 @@ private slots:
         auto graph = QSignalSource{&success, &TestObject::done} |
                      QSignalSource{&success2, &TestObject::done} |
                      QSignalSource{&success3, &TestObject::done};
-        connect(graph.get(), &QSignalDisjunction::done, [&trigged] {
+        graph->done([&trigged] {
             trigged = true;
         });
         success2.done();
@@ -31,7 +31,7 @@ private slots:
             QSignalSource{&nopesource, &TestObject::done}
         );
         std::optional<bool> ok;
-        QObject::connect(step.get(), &QSignalDisjunction::done, [&ok](const QVariant&) {
+        step->done([&ok](const QVariant&) {
             ok = true;
         });
         QCOMPARE(ok.has_value(), false);

@@ -10,17 +10,15 @@ using QSignalDisjunctionPtr = std::shared_ptr<QSignalDisjunction>;
 class QSignalConjunction;
 using QSignalConjunctionPtr = std::shared_ptr<QSignalConjunction>;
 
-class QSignalDisjunction: public QObject, public QSignalBaseJunction<QSignalDisjunction> {
-    Q_OBJECT
-
-signals:
-    void done(QVariant);
-
+class QSignalDisjunction: public QSignalBaseJunction<QSignalDisjunction> {
 protected:
     using QSignalBaseJunction<QSignalDisjunction>::QSignalBaseJunction;
 
 private:
     inline void do_connect(QSignalSource&& src);
+
+    template <typename JunctionPtrT>
+    void do_connect(JunctionPtrT&& src);
 
     // frendship
     friend class QSignalBaseJunction<QSignalDisjunction>;

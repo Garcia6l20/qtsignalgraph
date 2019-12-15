@@ -9,16 +9,30 @@ void QSignalConjunction::do_connect(QSignalSource &&src) {
         ss << src;
         qDebug() << this << QString::fromStdString(ss.str());
 #endif
-        disconnect(*conn);
+        QObject::disconnect(*conn);
         _sources.erase(src);
         if (_sources.empty()) {
             cleanup();
-            emit done(std::move(data));
+            if (_done)
+                _done(std::move(data));
         }
     });
     add_auto_clean_connection(*conn);
     _sources.emplace(std::forward<QSignalSource>(src));
 }
+
+template <typename JunctionPtrT>
+void QSignalConjunction::do_connect(JunctionPtrT&& src) {
+    src.done([this, src = src](QVariant data) {
+        src.done(nullptr);
+        if (_sources.empty()) {
+            cleanup();
+            if (_done)
+                _done(std::move(data));
+        }
+    });
+}
+
 
 inline std::ostream& operator<<(std::ostream& stream, const QSignalConjunction& conj) {
     stream << '(';

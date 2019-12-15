@@ -29,7 +29,7 @@ void QSignalBaseJunction<Derived>::add(FirstJunctionT&&first, JunctionsT&&...res
 template <typename Derived>
 template <typename JunctionPtrT>
 void QSignalBaseJunction<Derived>::add(JunctionPtrT&&junction) {
-    static_cast<Derived*>(this)->do_connect({junction.get(), &std::decay_t<decltype(*junction)>::done});
+    static_cast<Derived*>(this)->do_connect(junction);
     add_ref(std::forward<JunctionPtrT>(junction));
 }
 

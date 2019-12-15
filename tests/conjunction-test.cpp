@@ -18,7 +18,7 @@ private slots:
             QSignalSource{&obj2, &TestObject::done}
         );
         bool trigged = false;
-        QObject::connect(step.get(), &QSignalConjunction::done, [&trigged] {
+        step->done([&trigged] {
             trigged = true;
         });
         obj1.done();
@@ -34,7 +34,7 @@ private slots:
         auto conj = QSignalSource{&obj1, &TestObject::done} &
                      QSignalSource{&obj2, &TestObject::done} &
                      QSignalSource{&obj3, &TestObject::done};
-        connect(conj.get(), &QSignalConjunction::done, [&trigged] {
+        conj->done([&trigged] {
             trigged = true;
         });
         obj1.done();

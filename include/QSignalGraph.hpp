@@ -33,7 +33,7 @@ inline QSignalBinJunctionPtr operator||(SuccessJunctionT&& lhs, FailureJunctionT
 }
 
 inline QSignalDisjunctionPtr operator|(QSignalConjunctionPtr&& lhs, QSignalSource&& rhs) {
-    auto disj = QSignalDisjunction::make(QSignalSource{&*lhs, &QSignalConjunction::done}, std::forward<QSignalSource>(rhs));
+    auto disj = QSignalDisjunction::make(lhs, std::forward<QSignalSource>(rhs));
     disj->add_ref(std::forward<QSignalConjunctionPtr>(lhs));
     return disj;
 }
@@ -44,13 +44,13 @@ inline QSignalDisjunctionPtr operator|(QSignalDisjunctionPtr&& lhs, QSignalSourc
 }
 
 inline QSignalDisjunctionPtr operator|(QSignalSource&& lhs, QSignalConjunctionPtr&& rhs) {
-    auto disj = QSignalDisjunction::make(std::forward<QSignalSource>(lhs), QSignalSource{&*rhs, &QSignalConjunction::done});
+    auto disj = QSignalDisjunction::make(std::forward<QSignalSource>(lhs), rhs);
     disj->add_ref(std::forward<QSignalConjunctionPtr>(rhs));
     return disj;
 }
 
 inline QSignalDisjunctionPtr operator|(QSignalConjunctionPtr&& lhs, QSignalConjunctionPtr&& rhs) {
-    auto disj = QSignalDisjunction::make(QSignalSource{&*lhs, &QSignalConjunction::done}, QSignalSource{&*rhs, &QSignalConjunction::done});
+    auto disj = QSignalDisjunction::make(lhs, rhs);
     disj->add_ref(std::forward<QSignalConjunctionPtr>(lhs));
     disj->add_ref(std::forward<QSignalConjunctionPtr>(rhs));
     return disj;

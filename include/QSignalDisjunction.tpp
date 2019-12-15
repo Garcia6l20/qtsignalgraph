@@ -15,11 +15,20 @@ void QSignalDisjunction::do_connect(QSignalSource&& src) {
         qDebug() << this << "from" << QString::fromStdString(ss.str());
 #endif
         cleanup();
-        emit done(std::move(data));
+        if (_done)
+            _done(std::move(data));
     });
     _conns.emplace_back(conn);
     add_auto_clean_connection(conn);
+}
 
+template <typename JunctionPtrT>
+void QSignalDisjunction::do_connect(JunctionPtrT&& src) {
+    src->done([this](QVariant data) {
+        cleanup();
+        if (_done)
+            _done(std::move(data));
+    });
 }
 
 inline std::ostream& operator<<(std::ostream& stream, const QSignalDisjunction& disj) {
