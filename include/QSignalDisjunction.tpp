@@ -24,7 +24,7 @@ void QSignalDisjunction::do_connect(QSignalSource&& src) {
 
 template <typename JunctionPtrT>
 void QSignalDisjunction::do_connect(JunctionPtrT&& src) {
-    src->done([this](QVariant data) {
+    src->on_done([this](QVariant data) {
         cleanup();
         if (_done)
             _done(std::move(data));

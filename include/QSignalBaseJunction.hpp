@@ -36,21 +36,12 @@ public:
     QSignalBaseJunction& operator=(const QSignalBaseJunction&) = delete;
 
     template <typename Func>
-    void done(Func func) {
-        using func_traits = qsg::details::function_traits<Func>;
-        if constexpr (func_traits::arity == 0) {
-            _done = [func](QVariant&&) {
-                func();
-            };
-        } else {
-            _done = [func](QVariant&&data) {
-                func(std::forward<QVariant>(data));
-            };
-        }
+    void on_done(Func func) {
+        _done.bind(func);
     }
 
     void clear() {
-        _done = nullptr;
+        _done.clear();
     }
 
 protected:
@@ -60,7 +51,7 @@ protected:
     std::set<QSignalSource> _sources;
     std::list<QMetaObject::Connection> _conns;
 
-    std::function<void(QVariant)> _done;
+    OptionnalVariantListenerFunction _done;
 
     inline void cleanup();
 };

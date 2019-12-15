@@ -28,10 +28,18 @@ public:
     template <typename...Args>
     static QSignalBinJunctionPtr make(Args...args);
 
-signals:
-    void done(QVariant);
-    void failed(QVariant);
+    template <typename Func>
+    void on_done(Func func) {
+        _done.bind(func);
+    }
+
+    template <typename Func>
+    void on_failed(Func func) {
+        _failed.bind(func);
+    }
 protected:
+    OptionnalVariantListenerFunction _done;
+    OptionnalVariantListenerFunction _failed;
 
     QSignalBinJunction(QSignalSource&&true_src, QSignalSource&& false_src);
 

@@ -16,7 +16,7 @@ private slots:
         auto graph = QSignalSource{&success, &TestObject::done} |
                      QSignalSource{&success2, &TestObject::done} |
                      QSignalSource{&success3, &TestObject::done};
-        graph->done([&trigged] {
+        graph->on_done([&trigged] {
             trigged = true;
         });
         success2.done();
@@ -31,7 +31,7 @@ private slots:
             QSignalSource{&nopesource, &TestObject::done}
         );
         std::optional<bool> ok;
-        step->done([&ok](const QVariant&) {
+        step->on_done([&ok](const QVariant&) {
             ok = true;
         });
         QCOMPARE(ok.has_value(), false);

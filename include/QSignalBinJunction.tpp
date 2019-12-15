@@ -17,14 +17,16 @@ void QSignalBinJunction::do_connect() {
                 qDebug() << this << "success from" << QString::fromStdString(ss.str());
 #endif
                 cleanup();
-                emit done(std::move(data));
+                if (_done)
+                    _done(std::move(data));
             });
             add_auto_clean_connection(_trueConn);
         },
         [this](auto& src) {
-            src->done([this](QVariant data) {
+            src->on_done([this](QVariant data) {
                 cleanup();
-                emit done(std::move(data));
+                if (_done)
+                    _done(std::move(data));
             });
         },
     }, _trueSource);
@@ -37,14 +39,16 @@ void QSignalBinJunction::do_connect() {
                 qDebug() << this << "failure from" << QString::fromStdString(ss.str());
 #endif
                 cleanup();
-                emit failed(std::move(data));
+                if (_failed)
+                    _failed(std::move(data));
             });
             add_auto_clean_connection(_trueConn);
         },
         [this](auto& src) {
-            src->done([this](QVariant data) {
+            src->on_done([this](QVariant data) {
                 cleanup();
-                emit failed(std::move(data));
+                if (_failed)
+                    _failed(std::move(data));
             });
         },
     }, _falseSource);

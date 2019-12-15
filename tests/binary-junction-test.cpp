@@ -38,10 +38,10 @@ private slots:
         auto data = make_complex_test();
         auto& [srcOk1, srcOk2, srcFailed1, srcFailed2, graph] = *data;
         std::optional<bool> ok;
-        QObject::connect(&*graph, &QSignalBinJunction::done, [&ok] {
+        graph->on_done([&ok] {
             ok = true;
         });
-        QObject::connect(&*graph, &QSignalBinJunction::failed, [&ok] {
+        graph->on_failed([&ok] {
             ok = false;
         });
         QCOMPARE(ok.has_value(), false);
@@ -57,10 +57,10 @@ private slots:
         auto data = make_complex_test();
         auto& [srcOk1, srcOk2, srcFailed1, srcFailed2, graph] = *data;
         std::optional<bool> ok;
-        QObject::connect(graph.get(), &QSignalBinJunction::done, [&ok] {
+        graph->on_done([&ok] {
             ok = true;
         });
-        QObject::connect(graph.get(), &QSignalBinJunction::failed, [&ok] {
+        graph->on_failed([&ok] {
             ok = false;
         });
         std::cout << graph << std::endl;
@@ -79,10 +79,10 @@ private slots:
         auto data = make_complex_test();
         auto& [srcOk1, srcOk2, srcFailed1, srcFailed2, graph] = *data;
         std::optional<bool> ok;
-        QObject::connect(graph.get(), &QSignalBinJunction::done, [&ok] {
+        graph->on_done([&ok] {
             ok = true;
         });
-        QObject::connect(graph.get(), &QSignalBinJunction::failed, [&ok] {
+        graph->on_failed([&ok] {
             ok = false;
         });
         std::cout << graph << std::endl;

@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QMetaObject>
+#include <QVariant>
 
 #include <memory>
 #include <vector>
@@ -138,3 +139,40 @@ namespace qsg::details {
         : function_detail::types<Ret, std::nullptr_t, std::true_type, std::false_type, Args...>
     {};
 }
+
+
+class OptionnalVariantListenerFunction {
+public:
+    template <typename Func>
+    void bind(Func func) {
+        using func_traits = qsg::details::function_traits<Func>;
+        if constexpr (func_traits::arity == 0) {
+            _func = [func](QVariant&&) {
+                func();
+            };
+        }
+        else if constexpr (std::is_same_v<func_traits::arg<0>::clean_type, QVariant>) {
+            _func = [func](QVariant&& data) {
+                func(std::forward<QVariant>(data));
+            };
+        }
+        else {
+            _func = [func](QVariant&& data) {
+                func(std::forward<QVariant>(data).value<func_traits::arg<0>::clean_type>());
+            };
+        }
+    }
+    void clear() {
+        _func = nullptr;
+    }
+    void operator()(QVariant&& data) {
+        if (_func)
+            _func(std::forward<QVariant>(data));
+    }
+    operator bool() {
+        return _func != nullptr;
+    }
+private:
+    std::function<void(QVariant)> _func;
+};
+
