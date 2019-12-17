@@ -79,7 +79,8 @@ namespace qsg::details {
             template <typename...ArgsT>
             struct parameters_tuple_disable {
                 template <typename T>
-                static constexpr bool enabled = !std::disjunction_v<std::is_same<std::remove_cvref_t<T>, std::remove_cvref_t<ArgsT>>...>;
+                static constexpr bool enabled = !std::disjunction_v<std::is_same<std::remove_cv_t<std::remove_reference_t<T>>,
+                                                                                 std::remove_cv_t<std::remove_reference_t<ArgsT>>>...>;
             };
 
             template <typename Predicate = parameters_tuple_all_enabled>
@@ -150,15 +151,13 @@ public:
             _func = [func](QVariant&&) {
                 func();
             };
-        }
-        else if constexpr (std::is_same_v<func_traits::arg<0>::clean_type, QVariant>) {
+        } else if constexpr (std::is_same_v<typename func_traits::template arg<0>::clean_type, QVariant>) {
             _func = [func](QVariant&& data) {
                 func(std::forward<QVariant>(data));
             };
-        }
-        else {
+        } else {
             _func = [func](QVariant&& data) {
-                func(std::forward<QVariant>(data).value<func_traits::arg<0>::clean_type>());
+                func(std::forward<QVariant>(data).value<typename func_traits::template arg<0>::clean_type>());
             };
         }
     }
