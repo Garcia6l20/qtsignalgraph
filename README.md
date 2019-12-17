@@ -13,12 +13,12 @@
     auto graph = QSignalSource{src1, &QObject::destroyed} &
         QSignalSource{src2, &QObject::destroyed} &
         QSignalSource{src3, &QObject::destroyed};
-    QObject::connect(graph.get(), &QSignalConjunction::done, [] {
+    graph->on_done([] {
         qDebug() << "All objects have been destroyed";
     });
     ```
 
-- Signal conjunction:
+- Signal disjunctions:
     > Signal disjunctions can be interpreted like a logical *or*:
     ```cpp
     auto src1 = new QObject();
@@ -27,7 +27,7 @@
     auto graph = QSignalSource{src1, &QObject::destroyed} |
         QSignalSource{src2, &QObject::destroyed} |
         QSignalSource{src3, &QObject::destroyed};
-    QObject::connect(graph.get(), &QSignalDisjunction::done, [] {
+    graph->on_done([] {
         qDebug() << "An object have been destroyed";
     });
     ```
@@ -39,10 +39,10 @@
     auto src3 = new QObject();
     auto graph = (QSignalSource{src1, &QObject::destroyed} & QSignalSource{src2, &QObject::destroyed}) ||
         QSignalSource{src3, &QObject::destroyed};
-    QObject::connect(graph.get(), &QSignalBinaryJunction::done, [] {
+    graph->on_done([] {
         qDebug() << "Src1 and src2 object have been destroyed";
     });
-    QObject::connect(graph.get(), &QSignalBinaryJunction::failed, [] {
+    graph->on_failed([] {
         qDebug() << "Src3 object have been destroyed";
     });
     ```
