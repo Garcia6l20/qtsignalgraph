@@ -11,17 +11,16 @@ class QSignalConjunction;
 using QSignalConjunctionPtr = std::shared_ptr<QSignalConjunction>;
 
 class QSignalDisjunction: public QSignalBaseJunction<QSignalDisjunction> {
-protected:
+private:
     using QSignalBaseJunction<QSignalDisjunction>::QSignalBaseJunction;
 
-private:
     inline void do_connect(QSignalSource&& src);
 
     template <typename JunctionPtrT>
     void do_connect(JunctionPtrT&& src);
 
     // frendship
-    friend class QSignalBaseJunction<QSignalDisjunction>;
+    friend accessor;
     friend std::ostream& operator<<(std::ostream& stream, const QSignalDisjunction& disj);
 };
 

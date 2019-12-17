@@ -11,12 +11,12 @@
  * CRTP implementation for common Junction stuff.
  *
  */
-template <typename Devived>
+template <typename Derived>
 class QSignalBaseJunction:
         public qsg::details::shared_ref_holder,
         public qsg::details::auto_cleaned_connection_holder {
 public:
-    using junction_type = Devived;
+    using junction_type = Derived;
     using pointer_type = typename std::shared_ptr<junction_type>;
 
     template <typename...Args>
@@ -54,6 +54,11 @@ protected:
     OptionnalVariantListenerFunction _done;
 
     inline void cleanup();
+
+    struct accessor;
+
+private:
+    Derived& derived();
 };
 
 #include "QSignalBaseJunction.tpp"
