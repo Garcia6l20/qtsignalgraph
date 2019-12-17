@@ -13,6 +13,9 @@ public:
 
 signals:
     void done();
+    void fwd(int);
+    void fwd(double);
+    void fwd(QString);
 
 public slots:
     void reset() noexcept { _trigged = false; }

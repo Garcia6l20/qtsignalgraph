@@ -7,14 +7,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 find_package(Qt5 COMPONENTS Core REQUIRED)
 
-set(${PROJECT_NAME}_headers
-    include/QSignalGraph.hpp
-)
-
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 add_library(${PROJECT_NAME}
+    include/details/function_traits.hpp
+
     include/QSignalDetails.hpp
 
     include/QSignalGraph.hpp
